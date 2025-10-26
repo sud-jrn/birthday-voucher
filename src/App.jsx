@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import AuthGuard from './components/AuthGuard';
 import AdminSettings from './components/AdminSettings';
 import AdminPurchases from './components/AdminPurchases';
 import UserBalance from './components/UserBalance';
@@ -81,7 +82,11 @@ function App() {
               <AdminDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/" element={<UserDashboard />} />
+          <Route path="/" element={
+            <AuthGuard>
+              <UserDashboard />
+            </AuthGuard>
+          } />
           <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
