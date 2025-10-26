@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { settingsService } from '../services/firestore';
-import { isExpired, daysUntilExpiry } from '../utils/dateUtils';
+import { isExpired, daysUntilExpiry, formatDate } from '../utils/dateUtils';
 
 const UserBalance = () => {
   const [settings, setSettings] = useState(null);
