@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,9 +21,27 @@ const Login = () => {
     try {
       setError('');
       setLoading(true);
+      console.log('Attempting login with:', email);
       await login(email, password);
+      console.log('Login successful');
+      navigate('/admin');
     } catch (error) {
-      setError('ログインに失敗しました。メールアドレスとパスワードを確認してください。');
+      console.error('Login error:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      
+      let errorMessage = 'ログインに失敗しました。';
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'ユーザーが見つかりません。メールアドレスを確認してください。';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'パスワードが間違っています。';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'メールアドレスの形式が正しくありません。';
+      } else {
+        errorMessage = `エラー: ${error.message}`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
