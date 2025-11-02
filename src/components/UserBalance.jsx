@@ -16,20 +16,14 @@ const UserBalance = () => {
   const loadSettings = async () => {
     try {
       const data = await settingsService.getSettings();
+      console.log('Settings data:', data);
+      console.log('issuedAt:', data?.issuedAt);
       setSettings(data);
     } catch (error) {
       console.error('Error loading settings:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDate = (date) => {
-    if (!date) return '-';
-    if (date.seconds) {
-      return new Date(date.seconds * 1000).toLocaleDateString('ja-JP');
-    }
-    return new Date(date).toLocaleDateString('ja-JP');
   };
 
   if (loading) {

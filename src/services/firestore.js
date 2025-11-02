@@ -9,7 +9,8 @@ import {
   query,
   orderBy,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  Timestamp
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -34,13 +35,34 @@ export const settingsService = {
   async setSettings(data) {
     try {
       const settingsRef = doc(db, 'settings', 'current');
-      await setDoc(settingsRef, {
+      
+      // issuedAtの処理: 既に指定されている場合はそれを使い、なければ現在時刻
+      let issuedAtValue;
+      if (data.issuedAt) {
+        // 文字列の場合はDateオブジェクトに変換（Firestoreが自動的にTimestampに変換）
+        if (typeof data.issuedAt === 'string') {
+          // 日付文字列をDateに変換
+          const dateObj = new Date(data.issuedAt);
+          issuedAtValue = Timestamp.fromDate(dateObj);
+        } else {
+          issuedAtValue = data.issuedAt;
+        }
+      } else {
+        issuedAtValue = serverTimestamp();
+      }
+      
+      const settingsData = {
         ...data,
         year: new Date().getFullYear(),
         balance: parseInt(data.balance),
-        issuedAt: serverTimestamp(),
+        issuedAt: issuedAtValue,
         expireAt: data.expireAt || null
-      });
+      };
+      
+      console.log('Saving settings:', settingsData);
+      console.log('issuedAt value:', issuedAtValue);
+      
+      await setDoc(settingsRef, settingsData);
     } catch (error) {
       console.error('Error setting settings:', error);
       throw error;

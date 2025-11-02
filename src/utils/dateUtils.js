@@ -18,10 +18,27 @@ export const formatDate = (date) => {
   if (!date) return '-';
   
   let dateObj;
-  if (date.seconds) {
+  
+  // Firestore Timestamp オブジェクトの場合
+  if (date.seconds && date.nanoseconds !== undefined) {
     dateObj = new Date(date.seconds * 1000);
-  } else {
+  }
+  // 文字列の場合
+  else if (typeof date === 'string') {
     dateObj = new Date(date);
+  }
+  // Date オブジェクトの場合
+  else if (date instanceof Date) {
+    dateObj = date;
+  }
+  // その他の場合
+  else {
+    dateObj = new Date(date);
+  }
+  
+  // NaNチェック
+  if (isNaN(dateObj.getTime())) {
+    return '-';
   }
   
   return dateObj.toLocaleDateString('ja-JP');
